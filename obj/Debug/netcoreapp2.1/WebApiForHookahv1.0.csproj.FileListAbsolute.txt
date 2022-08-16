@@ -21,3 +21,4 @@ C:\Users\leade\source\repos\WebApiForHookahv1.0\WebApiForHookahv1.0\obj\Debug\ne
 C:\Users\leade\source\repos\WebApiForHookahv1.0\WebApiForHookahv1.0\obj\Debug\netcoreapp2.1\WebApiForHookahv1.0.dll
 C:\Users\leade\source\repos\WebApiForHookahv1.0\WebApiForHookahv1.0\obj\Debug\netcoreapp2.1\WebApiForHookahv1.0.pdb
 C:\Users\leade\source\repos\WebApiForHookahv1.0\WebApiForHookahv1.0\obj\Debug\netcoreapp2.1\WebApiForHookahv1.0.csproj.CopyComplete
+C:\Users\leade\source\repos\WebApiForHookahv1.0\WebApiForHookahv1.0\obj\Debug\netcoreapp2.1\WebApiForHookahv1.0.csprojAssemblyReference.cache

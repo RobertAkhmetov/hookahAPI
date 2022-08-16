@@ -87,13 +87,14 @@ namespace WebApiForHookahv1._0.Controllers
         }
 
 
-
         // POST: Hookah  Добавляем кальянную в базу
         [HttpPost]
-        public void Post(string title, int priceHookah, string iamge)//[FromBody] string value)
+        public void Post(string title, int priceHookah, string iamge, int CoordsLat, int CoordsLon,
+             int WorkTimeStart,int WorkTimeEnd,string FullAdress, string Vk, string Instagram,
+             string Ok,int ComplimentsHookah,int ComplimentsAtmosphere,int ComplimentsKitchen,
+             string MenuUrl1,string MenuUrl2,Dictionary<string, string> newNavi, int ReviewsRating,
+             string ReviewsCount)//[FromBody] string value)
         {
-
-
             hookIdContext.Hookas.AddRange(
                  new Hooka
                  {
