@@ -1,0 +1,72 @@
+﻿@model IEnumerable<WebApiForHookahv1._0.Models.Hooka>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Простой список кальянных</title>
+</head>
+
+<body>
+    <h3>Кальянные в заданной локации</h3>
+
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Название</th>
+            <th>Средняя цена кальяна</th>
+            <th>ссылка на заставку</th>
+            <th>широта</th>
+            <th>долгота</th>
+
+            <th>дата открытия</th>
+            <th>когда залили</th>
+            <th>дата открытия</th>
+            <th>когда залил</th>
+            <th>адрес</th>
+            <th>вк</th>
+            <th>инста</th>
+            <th>одноклассники</th>
+            <th>оценка кальяна</th>
+            <th>оценка атмосферы</th>
+            <th>оценка кухни</th>
+            <th>рейтинг ревью</th>
+            <th>просмотры</th>
+        </tr>
+        @foreach (var hooka in Model)
+        {
+        <tr>
+            <td>@hooka.Id</td>
+            <td>@hooka.Title </td>
+            <td>@hooka.PriceHookah</td>
+            <td>@hooka.Iamge</td>
+            <td>@hooka.CoordsLat</td>
+            <td>@hooka.CoordsLon</td>
+
+            <td>@hooka.WorkTimeStart</td>
+            <td>@hooka.WorkTimeEnd</td>
+            <td>@hooka.FullAdress</td>
+            <td>@hooka.Vk</td>
+            <td>@hooka.Instagram</td>
+            <td>@hooka.Ok</td>
+            <td>@hooka.ComplimentsHookah</td>
+            <td>@hooka.ComplimentsAtmosphere</td>
+            <td>@hooka.ComplimentsKitchen</td>
+            <td>@hooka.MenuUrl1</td>
+            <td>@hooka.MenuUrl2</td>
+            <td>@hooka.ReviewsRating</td>
+            <td>@hooka.ReviewsCount</td>
+           
+
+
+        </tr>
+        }
+    </table>
+</body>
+
+</html>
