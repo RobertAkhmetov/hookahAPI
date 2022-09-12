@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,11 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-
-using WebApiForHookahv1._0.Models;
+using WebApplication2.Models;
 using Microsoft.EntityFrameworkCore; // add for sql server (options => options.UseSqlServer(connection))
 
-namespace WebApiForHookahv1._0
+
+namespace WebApplication2
 {
     public class Startup
     {
@@ -32,8 +32,8 @@ namespace WebApiForHookahv1._0
         {
             // add db connection
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<HookaContext>(options => options.UseSqlServer(connection));
-            services.AddDbContext<UserContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<HookaContext>(options => options.UseNpgsql(connection));
+            services.AddDbContext<UserContext>(options => options.UseNpgsql(connection));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -54,4 +54,5 @@ namespace WebApiForHookahv1._0
             app.UseMvc();
         }
     }
+
 }
