@@ -5,121 +5,157 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApiForHookahv1._0.Models;
+using WebApplication2.Models;
+using Newtonsoft.Json;
 
-namespace WebApiForHookahv1._0.Controllers
+namespace WebApplication2.Controllers
 {
-    [Route("api/[controller]")]
+    //добавить отзыв к кальянной
+    [Route("review/add")]
     [ApiController]
     public class ReviewsController : ControllerBase
     {
-        private readonly HookaContext _context;
+        private readonly ReviewContext _reviewContext;
+        public HookaContext _hookaContext;
 
-        public ReviewsController(HookaContext context)
+
+        public ReviewsController(ReviewContext reviewContext,HookaContext hookaContext)
         {
-            _context = context;
+            _reviewContext = reviewContext;
+            _hookaContext = hookaContext;
         }
 
-        // GET: api/Reviews
-        [HttpGet]
-        public IEnumerable<Hooka> GetHookas()
-        {
-            return _context.Hookas;
-        }
-
-        // GET: api/Reviews/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetHooka([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var hooka = await _context.Hookas.FindAsync(id);
-
-            if (hooka == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(hooka);
-        }
-
-        // PUT: api/Reviews/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutHooka([FromRoute] int id, [FromBody] Hooka hooka)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != hooka.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(hooka).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!HookaExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Reviews
         [HttpPost]
-        public async Task<IActionResult> PostHooka([FromBody] Hooka hooka)
+        public async Task<IActionResult> ReviewAdd ([FromBody] Dictionary<string, object> ReviewAddRxData)
         {
-            if (!ModelState.IsValid)
+            Review addNowReview = new Review
             {
-                return BadRequest(ModelState);
-            }
+                idHookah = Convert.ToInt32(ReviewAddRxData["idHookah"]),
+                idUser = Convert.ToInt32(ReviewAddRxData["idUser"]),
+                comment = ReviewAddRxData["comment"].ToString(),
+                //compliments = ReviewAddRxData["compliments"].ToString().Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray(),
+                compliments = ReviewAddRxData["compliments"].ToString(),
+                rating = Convert.ToInt32(ReviewAddRxData["rating"]),
+                dateCreate = ReviewAddRxData["dateCreate"].ToString()
+            };
 
-            _context.Hookas.Add(hooka);
-            await _context.SaveChangesAsync();
+            //добавим в счетчик отзывов +1 к этой кальянной 
+            Hooka hooka = _hookaContext.hookas.Where(h => h.id == addNowReview.idHookah).FirstOrDefault();
+            hooka.ratingCount++;
 
-            return CreatedAtAction("GetHooka", new { id = hooka.Id }, hooka);
-        }
+            _reviewContext.reviews.Add(addNowReview);
+            _reviewContext.SaveChanges();
+            _hookaContext.SaveChanges();
 
-        // DELETE: api/Reviews/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteHooka([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var hooka = await _context.Hookas.FindAsync(id);
-            if (hooka == null)
-            {
-                return NotFound();
-            }
-
-            _context.Hookas.Remove(hooka);
-            await _context.SaveChangesAsync();
-
-            return Ok(hooka);
-        }
-
-        private bool HookaExists(int id)
-        {
-            return _context.Hookas.Any(e => e.Id == id);
+            return Ok("добавление отзыва прошло успешно");
         }
     }
+
+    //список отзывов по кальянной
+    [Route("review/list/hookah/{idRes}")]
+    [ApiController]
+    public class ReviewListController : ControllerBase
+    {
+        private readonly ReviewContext _reviewContext;
+        public HookaContext _hookaContext;
+
+
+        public ReviewListController(ReviewContext reviewContext, HookaContext hookaContext)
+        {
+            _reviewContext = reviewContext;
+            _hookaContext = hookaContext;
+        }
+
+        //[HttpGet("{id}", Name = "GetHookaAllReviewById")]
+        [HttpGet]
+        public string GetHookaAllReviewById (int idRes)
+        {
+            string result;
+            List<Review> reviewsAllField = new List<Review>();
+            Hooka hooka = _hookaContext.hookas.Where(h => h.id == idRes).FirstOrDefault();
+            if(hooka.active == true)
+            {
+                reviewsAllField.AddRange(_reviewContext.reviews.Where(r => r.idHookah == idRes & r.active == true));
+            }
+
+            List<ReviewForHookahReviewList> resultList = new List<ReviewForHookahReviewList>();
+            foreach (Review fullFieldRev in reviewsAllField)
+            {
+                resultList.Add(new ReviewForHookahReviewList
+                {
+                    id = fullFieldRev.id,
+                    idUser = fullFieldRev.idUser,
+                    comment = fullFieldRev.comment,
+                    rating = fullFieldRev.rating,
+                    dateCreate = fullFieldRev.dateCreate
+                }
+                );
+            }
+
+            result = JsonConvert.SerializeObject(resultList);
+            return result;
+        }
+    }
+
+
+    //удаление отзыва по id
+    [Route("review/delete")]
+    [ApiController]
+    public class ReviewDeleteController : ControllerBase
+    {
+        private readonly ReviewContext _reviewContext;
+        public HookaContext _hookaContext;
+
+        public ReviewDeleteController(ReviewContext reviewContext, HookaContext hookaContext)
+        {
+            _reviewContext = reviewContext;
+            _hookaContext = hookaContext;
+        }
+        
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+            Review reviewDel = _reviewContext.reviews.Where(r => r.id == id).FirstOrDefault();
+            _reviewContext.Remove(reviewDel);
+            _reviewContext.SaveChanges();
+        }
+    }
+
+
+    //обновление отзыва по кальянной
+    [Route("review")]
+    [ApiController]
+    public class ReviewRefreshController : ControllerBase
+    {
+        private readonly ReviewContext _reviewContext;
+        public HookaContext _hookaContext;
+
+
+        public ReviewRefreshController(ReviewContext reviewContext, HookaContext hookaContext)
+        {
+            _reviewContext = reviewContext;
+            _hookaContext = hookaContext;
+        }
+
+
+        [HttpPut]
+        public void Refresh([FromBody] Dictionary<string, object> ReviewRefRxData)
+        {
+            Review reviewRef = _reviewContext.reviews.Where(r => r.id == 
+                            Convert.ToInt32(ReviewRefRxData["id"])).FirstOrDefault();
+
+            reviewRef.idUser = Convert.ToInt32(ReviewRefRxData["idUser"]);
+            reviewRef.comment = ReviewRefRxData["comment"].ToString();
+            reviewRef.compliments = ReviewRefRxData["compliments"].ToString();
+            reviewRef.rating = Convert.ToInt32(ReviewRefRxData["rating"]);
+            reviewRef.dateCreate = ReviewRefRxData["dateCreate"].ToString();
+            reviewRef.active = bool.Parse(ReviewRefRxData["active"].ToString());
+
+            _reviewContext.SaveChanges();
+        }
+
+    }
+
+
+
 }
